@@ -1,0 +1,37 @@
+1. Add data to template
+$mustache ~/data.yaml ~/onboarding.template.patch > ~/onboarding.patch
+
+2. Store lines from data.yaml in variables
+${ IFS= read -r LINE1 && IFS= read -r LINE2 && IFS= read -r LINE3 && IFS= read -r LINE4; } < ~/data.yaml
+
+3. Remove labels from variables (can't have space after VARIABLE= or it's read a command)
+$NAMESPACE=${LINE1##* }
+$GROUP=${LINE2##* }
+$QUOTA=${LINE3##* }
+$CLUSTER=${LINE4##* }
+
+4. Create new branch
+git checkout -b "onboard/$NAMESPACE"
+
+5. Apply patch to branch
+$git apply ~/onboarding.patch
+
+6. Add the changed files
+$git add ./cluster-scope/base/core/namespaces/$NAMESPACE/kustomization.yaml
+$git add ./cluster-scope/base/core/namespaces/$NAMESPACE/namespace.yaml
+$git add ./cluster-scope/overlays/prod/$CLUSTER/kustomization.yaml
+
+7. Commit changes
+$git commit -m "onboarding $NAMESPACE"
+
+8. Push to remote
+$git push -u origin HEAD
+
+9. Create PR
+
+$gh pr create -R tssala23/OFApps --title "Onboardng $NAMESPACE" --body "Onboarding for $NAMESPACE to the $CLUSTER cluster" -f
+
+Caveat
+- PR require gh auth login first
+- PR request specific to my repo
+- More meta data will be sent to pipeline e.g. description, which can be written into PR
