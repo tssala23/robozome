@@ -25,7 +25,7 @@ $git add ./cluster-scope/overlays/prod/$CLUSTER/kustomization.yaml
 $git commit -m "onboarding $NAMESPACE"
 
 8. Push to remote
-$git push origin onboard/$NAMESPACE
+$git push -u origin HEAD
 
 9. Create PR
 
@@ -42,8 +42,7 @@ $git commit -m "onboarding $NAMESPACE"
 
 8. Create PR
 
-$gh pr create --title "Onboardng $NAMESPACE" --body "Onboarding for $NAMESPACE to the $CLUSTER cluster"
+$gh pr create -R tssala23/OFApps --title "Onboardng $NAMESPACE" --body "Onboarding for $NAMESPACE to the $CLUSTER cluster" -f
 
 Caveat
 - PR require gh auth login first
-- On creating PR it asks "Which should be the base repository (used for e.g. querying issues) for this directory?" with the options being my fork of the repo or the original repo. 
