@@ -29,20 +29,8 @@ $git push -u origin HEAD
 
 9. Create PR
 
-$gh pr create --title "Onboardng $NAMESPACE" --body "Onboarding for $NAMESPACE to the $CLUSTER cluster"
-
-Caveat
-- PR require gh auth login first
-- As I tested on fork of repo PR did require interactive selection of which repo to use
-$git add ./cluster-scope/base/core/namespaces/$NAMESPACE/namespace.yaml
-$git add ./cluster-scope/overlays/prod/$CLUSTER/kustomization.yaml
-
-7. Commit changes
-$git commit -m "onboarding $NAMESPACE"
-
-8. Create PR
-
 $gh pr create -R tssala23/OFApps --title "Onboardng $NAMESPACE" --body "Onboarding for $NAMESPACE to the $CLUSTER cluster" -f
 
 Caveat
 - PR require gh auth login first
+- PR request specific to my repo
