@@ -3,7 +3,7 @@
  * @param {import('probot').Probot} app
  */
 
-const generateTaskPayload = (cluster, teamName, namespace, description, userAccess, quota, gpgKey) => ({
+const onboardingPayload = (cluster, teamName, namespace, description, userAccess, quota, gpgKey) => ({
   apiVersion: 'tekton.dev/v1betal',
   kind: 'TaskRun',
   metadata: {
