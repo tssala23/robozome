@@ -58,9 +58,13 @@ module.exports = (app) => {
     const body = context.payload.issue["body"];
     const metaData = body.split("\n\n");
 
-    //Identify if it is an onboarding issue and store metadata in variables
+    //Identify if it is an onboarding issue and store metadata in variables with labels for data patch file
     if(metaData[0] == "### Target cluster"){
-      const cluster = "cluster: " + metaData[1]; // add labels for the data file
+      if(metaData[1] == "smaug" || metaData[1] == "infra"){
+        const cluster = "cluster: moc/" + metaData[1];
+      } else{
+        const cluster = "cluster: emea/" + metaData[1];
+      };
       const teamName = "group: " + metaData[3];
       const namespace = "namespace: " + metaData[5];
       var quota;
