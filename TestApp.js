@@ -54,18 +54,36 @@ module.exports = (app) => {
       body: "Thanks for submitting onboarding request!",
     });
 
+    //Store the body of the issue and split it but \n\n. Body of onboarding issue split by \n\n
     const body = context.payload.issue["body"];
     const metaData = body.split("\n\n");
 
+    //Identify if it is an onboarding issue and store metadata in variables
     if(metaData[0] == "### Target cluster"){
-      const cluster = /*metaData[0] + ": " + */metaData[1];
-      const teamName = /*metaData[2] + ": " + */metaData[3];
-      const namespace = /*metaData[4] + ": " + */metaData[5];
-      const description = /*metaData[6] + ": " + */metaData[7];
-      const userAccess = /*metaData[8] + ": " + */metaData[9];
-      const quota = /*metaData[10] + ": " + */metaData[11];
-      const customQuota = /*metaData[12] + ": " + */metaData[13]; // if custom quota = _No response_
-      const GPG = /*metaData[14] + ": " + */metaData[15]; // if GPG = _No response_
+      const cluster = "cluster: " + metaData[1]; // add labels for the data file
+      const teamName = "group: " + metaData[3];
+      const namespace = "namespace: " + metaData[5];
+      var quota;
+      if(metaData[11] == "Custom"){
+        var quota = metaData[13];
+      } else {
+        var quota = metaData[11];
+      };
+
+      //const description = metaData[7]; Constants not needed as can just access the array
+      //const userAccess = metaData[9];
+      //const GPG = metaData[15]; // if GPG = _No response_
+
+      //Save meta data in file to be read for patch
+      const fileData = namespace + "\n" + teamName + "\n" + "quota: " + quota + "\n" + cluster;
+      var fs = require('fs');
+      fs.writeFile('testData.yaml', fileData, (err) => {
+
+        if (err) throw err; //error to be handled if file not saved
+
+        console.log('Data saved');
+      });
+      
 
       return context.octokit.issues.createComment(issueComment); // Send response to user
     }
