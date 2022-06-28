@@ -34,3 +34,4 @@ $gh pr create -R tssala23/OFApps --title "Onboardng $NAMESPACE" --body "Onboardi
 Caveat
 - PR require gh auth login first
 - PR request specific to my repo
+- More meta data will be sent to pipeline e.g. description, which can be written into PR
