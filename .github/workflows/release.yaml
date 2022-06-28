@@ -57,7 +57,7 @@ jobs:
 
       - name: Build
         id: build
-        uses: ./.github/actions/build-controller
+        uses: ./.github/actions/build
 
       - name: Update comment
         uses: peter-evans/create-or-update-comment@v2
@@ -166,7 +166,7 @@ jobs:
           ref: ${{ needs.release-to-git.outputs.tag }}
 
       - name: Build
-        uses: ./.github/actions/build-controller
+        uses: ./.github/actions/build
         id: build
         with:
           tags: ${{ github.sha }} ${{ needs.release-to-git.outputs.tag }}

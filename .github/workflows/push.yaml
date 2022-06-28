@@ -16,8 +16,8 @@ jobs:
       - name: Test
         uses: ./.github/actions/test
 
-  build-controller:
-    name: Build and Push Controller
+  build:
+    name: Build and Push
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,51 +27,22 @@ jobs:
         uses: ./.github/actions/build-controller
         with:
           tags: ${{ github.sha }} latest
+      #     image: IMAGE
+      #
+      # - name: Push To Quay
+      #   uses: redhat-actions/push-to-registry@v2
+      #   if: ${{ github.repository == 'ORG/REPO'}}
+      #   with:
+      #     image: IMAGE
+      #     tags: ${{ github.sha }} latest
+      #     registry: quay.io/QUAY_ORG
+      #     username: ${{ secrets.QUAY_USERNAME }}
+      #     password: ${{ secrets.QUAY_PASSWORD }}
 
-      - name: Push To Quay
-        uses: redhat-actions/push-to-registry@v2
-        if: ${{ github.repository == 'open-services-group/peribolos-as-a-service'}}
-        with:
-          image: peribolos-as-a-service
-          tags: ${{ github.sha }} latest
-          registry: quay.io/open-services-group
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
-
-      - name: Set expiration
-        uses: ./.github/actions/set-expiration
-        with:
-          repository: open-services-group/peribolos-as-a-service
-          tag: ${{ github.sha }}
-          expiration: +1 week
-          token: ${{ secrets.QUAY_OAUTH_TOKEN }}
-
-  build-peribolos:
-    name: Build and Push Peribolos
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Build
-        uses: ./.github/actions/build-peribolos
-        with:
-          tags: ${{ github.sha }} latest
-
-      - name: Push To Quay
-        uses: redhat-actions/push-to-registry@v2
-        if: ${{ github.repository == 'open-services-group/peribolos-as-a-service'}}
-        with:
-          image: peribolos
-          tags: ${{ github.sha }} latest
-          registry: quay.io/open-services-group
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
-
-      - name: Set expiration
-        uses: ./.github/actions/set-expiration
-        with:
-          repository: open-services-group/peribolos
-          tag: ${{ github.sha }}
-          expiration: +1 week
-          token: ${{ secrets.QUAY_OAUTH_TOKEN }}
+      # - name: Set expiration
+      #   uses: ./.github/actions/set-expiration
+      #   with:
+      #     repository: QUAY_ORG/QUAY_REPO
+      #     tag: ${{ github.sha }}
+      #     expiration: +1 week
+      #     token: ${{ secrets.QUAY_OAUTH_TOKEN }}
