@@ -1,8 +1,8 @@
 {
-  "name": "{{name}}",
+  "name": "robozome",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://github.com/{{org-repo}}",
+  "homepage": "https://github.com/operate-first/robozome",
   "scripts": {
     "build": "tsc",
     "start": "node lib/index.js",
