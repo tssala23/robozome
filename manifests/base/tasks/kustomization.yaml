@@ -11,3 +11,11 @@ commonLabels:
 images:
 - name: opf-toolbox
   newName: quay.io/operate-first/opf-toolbox:v0.5.0
+- name: python
+  newName: registry.access.redhat.com/ubi8/python-38
+configMapGenerator:
+- name: robozome
+  files:
+  - onboarding.patch
+generatorOptions:
+  disableNameSuffixHash: true
