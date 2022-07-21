@@ -195,31 +195,29 @@ export default (
            body: "Thanks for submitting onboarding request!",
          });
     
-    let data;
     try {
-      data = await parse(context);
+      let data = await parse(context);
+
+      const body:string = context.payload.issue["body"];
+      if (body.includes("### Target cluster")){ //Used to check if it is a onboarding request
+        if (data["quota"][0] == "custom"){
+          data["quota"] = data["custom-quota"];
+        };
+  
+        const payload = JSON.stringify(data); //format data to send to task
+  
+        createTaskRun('robozome-onboarding', context, [
+          {
+            name: 'PAYLOAD',
+            value: payload,
+          },
+        ]);
+
+        return context.octokit.issues.createComment(issueComment); //Send confirmation message
+      };
     } catch {
       app.log.info('Issue was not created using Issue form template (the YAML ones)');
     }
-
-    const body:string = context.payload.issue["body"];
-    if (body.includes("### Target cluster")){ //Used to check if it is a onboarding request
-
-      if (data["quota"][0] == "custom"){
-        data["quota"] = data["custom-quota"];
-      };
-  
-      const payload = JSON.stringify(data); //format data to send to task
-  
-      createTaskRun('robozome-onboarding', context, [
-        {
-          name: 'PAYLOAD',
-          value: payload,
-        },
-      ]);
-
-      return context.octokit.issues.createComment(issueComment); //Send confirmation message
-    };
 
   });
 };
