@@ -195,20 +195,17 @@ export default (
   });
 
   app.on("issues.opened", async(context: any) => {
-    let issueComment = context.issue({
-           body: "Thanks for submitting onboarding request!",
-         });
-    
     try {
       let data = await parse(context);
 
       const body:string = context.payload.issue["body"];
+
       if (body.includes("### Target cluster")){ //Used to check if it is a onboarding request
-        if (data["quota"][0] == "custom"){
-          data["quota"] = data["custom-quota"];
-        };
+
+        data["cluster"] = data["cluster"][0]; //remove lists so string value passed to task
+        data["quota"] = data["quota"][0];
   
-        const payload = JSON.stringify(data); //format data to send to task
+        const payload = JSON.stringify(JSON.stringify(data)); //format data to send to task
   
         createTaskRun('robozome-onboarding', context, [
           {
@@ -216,6 +213,9 @@ export default (
             value: payload,
           },
         ]);
+
+        //Create message to respond to request
+        let issueComment = context.issue({body: "Thanks for submitting onboarding request!",});
 
         return context.octokit.issues.createComment(issueComment); //Send confirmation message
       };
