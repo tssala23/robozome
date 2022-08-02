@@ -84,6 +84,10 @@ export default (
   ) => {
     const params = [
       {
+        name: 'REPO_NAME',
+        value: context.payload["repository"]["name"],
+      },
+      {
         name: 'SECRET_NAME',
         value: getTokenSecretName(context),
       },
