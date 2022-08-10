@@ -10,6 +10,7 @@ import {
   updateTokenSecret,
   useApi,
 } from '@operate-first/probot-kubernetes';
+import parse from '@operate-first/probot-issue-form';
 
 const generateTaskPayload = (name: string, context: any) => ({
   apiVersion: 'tekton.dev/v1beta1',
@@ -74,6 +75,52 @@ export default (
     help: 'Metrics for action triggered by the operator with respect to the kubernetes operations.',
     labelNames: ['install', 'operation', 'status', 'method'],
   });
+
+  //From peribolos app.ts
+  const createTaskRun = (
+    name: string,
+    context: any,
+    extraParams: Array<Record<string, unknown>> = []
+  ) => {
+    const params = [
+      {
+        name: 'REPO_NAME',
+        value: context.payload['repository']['name'],
+      },
+      {
+        name: 'SECRET_NAME',
+        value: getTokenSecretName(context),
+      },
+      ...extraParams,
+    ];
+    const taskRunpayload = {
+      apiVersion: 'tekton.dev/v1beta1',
+      kind: 'TaskRun',
+      metadata: {
+        generateName: name + '-',
+      },
+      spec: {
+        taskRef: {
+          name,
+        },
+        params: params,
+      },
+    };
+
+    wrapOperationWithMetrics(
+      useApi(APIS.CustomObjectsApi).createNamespacedCustomObject(
+        'tekton.dev',
+        'v1beta1',
+        getNamespace(),
+        'taskruns',
+        taskRunpayload
+      ),
+      {
+        install: context.payload.installation.id,
+        method: name,
+      }
+    );
+  };
 
   // Simple callback wrapper - executes and async operation and based on the result it inc() operationsTriggered counted
   const wrapOperationWithMetrics = (callback: Promise<any>, labels: any) => {
@@ -145,5 +192,40 @@ export default (
       install: context.payload.installation.id,
       method: 'deleteSecret',
     });
+  });
+
+  app.on('issues.opened', async (context: any) => {
+    try {
+      let data = await parse(context);
+
+      const body: string = context.payload.issue['body'];
+
+      if (body.includes('### Target cluster')) {
+        //Used to check if it is a onboarding request
+
+        data['cluster'] = data['cluster'][0]; //remove lists so string value passed to task
+        data['quota'] = data['quota'][0];
+
+        const payload = JSON.stringify(JSON.stringify(data)); //format data to send to task
+
+        createTaskRun('robozome-onboarding', context, [
+          {
+            name: 'PAYLOAD',
+            value: payload,
+          },
+        ]);
+
+        //Create message to respond to request
+        let issueComment = context.issue({
+          body: 'Thanks for submitting onboarding request!',
+        });
+
+        return context.octokit.issues.createComment(issueComment); //Send confirmation message
+      }
+    } catch {
+      app.log.info(
+        'Issue was not created using Issue form template (the YAML ones)'
+      );
+    }
   });
 };
